@@ -29,17 +29,17 @@ struct AppTypography {
 
     private static func defaultSize(for type: TextStyleType) -> CGFloat {
         switch type {
-        case .displayHero:   return 11
+        case .displayHero:   return 40
         case .displayLarge:  return 32
         case .displayMedium: return 24
-        case .displaySmall:  return 18
-        case .labelLarge:    return 14
-        case .labelMedium:   return 11
-        case .labelSmall:    return 10
+        case .displaySmall:  return 20
+        case .labelLarge:    return 16
+        case .labelMedium:   return 14
+        case .labelSmall:    return 12
         case .monoBody:      return 14
         case .monoSmall:     return 13
-        case .monoCaption:   return 11
-        case .monoMicro:     return 10
+        case .monoCaption:   return 12
+        case .monoMicro:     return 11
         }
     }
 

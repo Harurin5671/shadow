@@ -62,13 +62,7 @@ struct OnboardingStep1View: View {
 
             VStack(alignment: .leading, spacing: 16) {
 
-                Text(
-                    """
-                    Ningún servidor
-                    lee tus
-                    mensajes.
-                    """
-                )
+                Text(String(localized: "onboarding.step1.headline").replacingOccurrences(of: "\\n", with: "\n"))
                 .textStyle(
                     .displayLarge,
                     family: .spaceGrotesk,
@@ -76,28 +70,31 @@ struct OnboardingStep1View: View {
                     size: 36,
                 )
 
-                Text(
-                    "Tu clave de cifrado nunca sale de tu dispositivo. Solo los presentes en la sala pueden leer — ni el servidor, ni Apple, ni nadie externo."
-                ).textStyle(
+                Text(String(localized: "onboarding.step1.subtitle").replacingOccurrences(of: "\\n", with: "\n")).textStyle(
                     .monoBody,
                     family: .jetbrains,
-                    color: Color(hex: "#94A3B8")
+                    color: .color(Color(hex: "#94A3B8")),
+                    size: 14
                 )
             }
             .padding(.horizontal, 24)
             .padding(.top, 32)
+            
+            Spacer().frame(height: 48)
 
             OnboardingProgressBar(current: 1, total: 3)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 20)
+            
+            Spacer().frame(height: 24)
 
             Button(action: onNext) {
                 HStack {
-                    Text("siguiente")
+                    Text("onboarding.step.nextBtn")
                         .textStyle(
                             .monoBody,
                             family: .spaceGrotesk,
-                            color: Color(hex: "#0F172A"),
+                            color: .color(Color(hex: "#0F172A")),
                             uppercase: true
                         )
 
