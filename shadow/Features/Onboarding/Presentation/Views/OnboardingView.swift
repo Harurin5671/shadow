@@ -10,6 +10,7 @@ import SwiftUI
 @Observable
 final class OnboardingViewModel {
     var currentStep: Step = .one
+    var isGoingForward: Bool = true
 
     enum Step: Int, CaseIterable {
         case one = 1
@@ -19,8 +20,12 @@ final class OnboardingViewModel {
 
     func nextStep() {
         switch currentStep {
-        case .one: currentStep = .two
-        case .two: currentStep = .three
+        case .one:
+            isGoingForward = true
+            currentStep = .two
+        case .two:
+            isGoingForward = true
+            currentStep = .three
         case .three: break
         }
     }
@@ -28,8 +33,12 @@ final class OnboardingViewModel {
     func previousStep() {
         switch currentStep {
         case .one: break
-        case .two: currentStep = .one
-        case .three: currentStep = .two
+        case .two:
+            isGoingForward = false
+            currentStep = .one
+        case .three:
+            isGoingForward = false
+            currentStep = .two
         }
     }
 }
@@ -101,13 +110,16 @@ struct OnboardingView: View {
             )
         }
     }
-    
+
     private var stepTransition: AnyTransition {
-            .asymmetric(
-                insertion: .move(edge: .trailing).combined(with: .opacity),
-                removal: .move(edge: .leading).combined(with: .opacity)
-            )
-        }
+        let edge: Edge = vm.isGoingForward ? .trailing : .leading
+        let removeEdge: Edge = vm.isGoingForward ? .leading : .trailing
+
+        return .asymmetric(
+            insertion: .move(edge: edge).combined(with: .opacity),
+            removal: .move(edge: removeEdge).combined(with: .opacity)
+        )
+    }
 }
 
 #Preview {

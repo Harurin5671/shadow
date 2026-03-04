@@ -64,16 +64,20 @@ struct OnboardingStep2View: View {
             Spacer().frame(height: 16)
 
             Text.localized("onboarding.step2.subtitle")
-            .textStyle(
-                .labelLarge,
-                family: .spaceGroteskRegular,
-                color: .color(Color(hex: "#94A3B8")),
-                alignment: .center
-            )
-            
+                .textStyle(
+                    .labelLarge,
+                    family: .spaceGroteskRegular,
+                    color: .color(Color(hex: "#94A3B8")),
+                    alignment: .center
+                )
+
             Spacer().frame(height: 24)
-            
+
             OnboardingProgressBar(current: 2, total: 3)
+
+            Spacer().frame(height: 32)
+
+            OnboardingCTAButton(step: 2, totalSteps: 3, action: onNext)
         }
     }
 }

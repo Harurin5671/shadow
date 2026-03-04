@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AppView: View {
-    @State private var router = AppRouter()
+    @Environment(AppRouter.self) private var router
 
     var body: some View {
         Group {

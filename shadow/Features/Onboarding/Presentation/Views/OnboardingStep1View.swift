@@ -12,52 +12,9 @@ struct OnboardingStep1View: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            ZStack(alignment: .center) {
-                // Rectángulo de atrás - rotado -12°
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(Color(hex: "#E7FF47").opacity(0.05))
-                    .frame(width: 192, height: 192)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 2)
-                            .stroke(
-                                Color(hex: "#E7FF47").opacity(0.6),
-                                lineWidth: 1
-                            )
-                    )
-                    .rotationEffect(.degrees(-12))
-
-                // Rectángulo del medio - rotado 6°
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(Color(hex: "#E7FF47").opacity(0.05))
-                    .frame(width: 192, height: 192)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 2)
-                            .stroke(
-                                Color(hex: "#E7FF47").opacity(0.6),
-                                lineWidth: 1
-                            )
-                    )
-                    .rotationEffect(.degrees(6))
-
-                // Rectángulo frontal
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(Color(hex: "#21230F").opacity(0.50))
-                    .frame(width: 160, height: 160)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 2)
-                            .stroke(
-                                Color(hex: "#E7FF47").opacity(1.0),
-                                lineWidth: 2
-                            )
-                    )
-
-                // Ícono del candado
-                Image(systemName: "lock.fill")
-                    .font(.system(size: 48))
-                    .foregroundColor(Color(hex: "#E7FF47"))
-            }
-            .frame(maxWidth: .infinity)  // 👈 esto lo centra
-            .frame(height: 240)  // 👈 altura fija para que no colapse
+            StackedCardIcon()
+            .frame(maxWidth: .infinity)
+            .frame(height: 240)
             .padding(.top, 32)
 
             VStack(alignment: .leading, spacing: 16) {
@@ -86,27 +43,6 @@ struct OnboardingStep1View: View {
 
             Spacer().frame(height: 24)
 
-            //            Button(action: onNext) {
-            //                HStack {
-            //                    Text("onboarding.step.nextBtn")
-            //                        .textStyle(
-            //                            .monoBody,
-            //                            family: .spaceGrotesk,
-            //                            color: .color(Color(hex: "#0F172A")),
-            //                            uppercase: true
-            //                        )
-            //
-            //                    Spacer()
-            //
-            //                    Image(systemName: "arrow.right")
-            //                        .font(.system(size: 20))
-            //                        .foregroundColor(Color(hex: "#0F172A"))
-            //                }
-            //                .padding(.horizontal, 24)
-            //                .frame(maxWidth: .infinity)
-            //                .frame(height: 56)
-            //                .background(Color.accentYellow)
-            //            }
             OnboardingCTAButton(step: 1, totalSteps: 3, action: onNext)
         }
     }
