@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct shadowApp: App {
+    @State private var router = AppRouter()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppView()
+                .environment(router)
+                .preferredColorScheme(ColorScheme.dark)
         }
     }
 }
