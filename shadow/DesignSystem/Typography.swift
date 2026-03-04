@@ -10,8 +10,11 @@ import SwiftUI
 
 enum AppFontFamily {
     case syne
+    case syneBold
     case jetbrains
+    case jetbrainsLight
     case spaceGrotesk
+    case spaceGroteskRegular
 }
 
 struct AppTypography {
@@ -62,9 +65,16 @@ struct AppTypography {
                 return type.isLabel
                     ? "Syne-Bold"
                     : "Syne-ExtraBold"
+            case .syneBold:
+                return "Syne-Bold"
+                
+            case .jetbrainsLight:
+                return "JetBrainsMono-Light"
 
             case .spaceGrotesk:
                 return "SpaceGrotesk-Bold"
+            case .spaceGroteskRegular:
+                return "SpaceGrotesk-Regular"
 
             case .jetbrains:
                 return "JetBrainsMono-Regular"

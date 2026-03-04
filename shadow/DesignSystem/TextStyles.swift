@@ -126,15 +126,20 @@ struct AppTextStyle: ViewModifier {
     }
 
     func body(content: Content) -> some View {
-        content
+        let base = content
             .font(resolvedFont)
             .tracking(kerning ?? defaultTracking)
             .foregroundStyle(textColor.shapeStyle)
             .textCase(resolvedUppercase ? .uppercase : nil)
             .lineLimit(lineLimit)
             .lineSpacing(lineSpacing ?? 0)
-            .multilineTextAlignment(alignment?.alignment ?? .leading)
             .truncationMode(truncationMode ?? .tail)
+
+        if let alignment {
+            base.multilineTextAlignment(alignment.alignment)
+        } else {
+            base
+        }
     }
 
     private var resolvedFont: Font {
@@ -142,7 +147,7 @@ struct AppTextStyle: ViewModifier {
     }
 
     private var resolvedUppercase: Bool {
-        forceUppercase ?? type.isLabel
+        forceUppercase ?? false
     }
 
     private var defaultTracking: CGFloat {

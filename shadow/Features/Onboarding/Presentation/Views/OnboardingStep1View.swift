@@ -62,15 +62,15 @@ struct OnboardingStep1View: View {
 
             VStack(alignment: .leading, spacing: 16) {
 
-                Text(String(localized: "onboarding.step1.headline").replacingOccurrences(of: "\\n", with: "\n"))
-                .textStyle(
-                    .displayLarge,
-                    family: .spaceGrotesk,
-                    uppercase: true,
-                    size: 36,
-                )
+                Text.localized("onboarding.step1.headline")
+                    .textStyle(
+                        .displayLarge,
+                        family: .spaceGrotesk,
+                        uppercase: true,
+                        size: 36,
+                    )
 
-                Text(String(localized: "onboarding.step1.subtitle").replacingOccurrences(of: "\\n", with: "\n")).textStyle(
+                Text.localized("onboarding.step1.subtitle").textStyle(
                     .monoBody,
                     family: .jetbrains,
                     color: .color(Color(hex: "#94A3B8")),
@@ -79,38 +79,35 @@ struct OnboardingStep1View: View {
             }
             .padding(.horizontal, 24)
             .padding(.top, 32)
-            
+
             Spacer().frame(height: 48)
 
             OnboardingProgressBar(current: 1, total: 3)
-                .padding(.horizontal, 24)
-                .padding(.bottom, 20)
-            
+
             Spacer().frame(height: 24)
 
-            Button(action: onNext) {
-                HStack {
-                    Text("onboarding.step.nextBtn")
-                        .textStyle(
-                            .monoBody,
-                            family: .spaceGrotesk,
-                            color: .color(Color(hex: "#0F172A")),
-                            uppercase: true
-                        )
-
-                    Spacer()
-
-                    Image(systemName: "arrow.right")
-                        .font(.system(size: 20))
-                        .foregroundColor(Color(hex: "#0F172A"))
-                }
-                .padding(.horizontal, 24)
-                .frame(maxWidth: .infinity)
-                .frame(height: 56)
-                .background(Color.accentYellow)
-            }
-            .padding(.horizontal, 24)
-            .padding(.bottom, 48)
+            //            Button(action: onNext) {
+            //                HStack {
+            //                    Text("onboarding.step.nextBtn")
+            //                        .textStyle(
+            //                            .monoBody,
+            //                            family: .spaceGrotesk,
+            //                            color: .color(Color(hex: "#0F172A")),
+            //                            uppercase: true
+            //                        )
+            //
+            //                    Spacer()
+            //
+            //                    Image(systemName: "arrow.right")
+            //                        .font(.system(size: 20))
+            //                        .foregroundColor(Color(hex: "#0F172A"))
+            //                }
+            //                .padding(.horizontal, 24)
+            //                .frame(maxWidth: .infinity)
+            //                .frame(height: 56)
+            //                .background(Color.accentYellow)
+            //            }
+            OnboardingCTAButton(step: 1, totalSteps: 3, action: onNext)
         }
     }
 }

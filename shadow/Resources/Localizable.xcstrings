@@ -24,7 +24,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No server\\nreads\\nyour\\nmessages."
+            "value" : "No server reads\\nyour messages."
           }
         },
         "es" : {
@@ -65,6 +65,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Auto-destrucción"
+          }
+        }
+      }
+    },
+    "onboarding.step2.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 hour without activity and\\neverything disappears - messages,\\nrooms, history. As if it never existed."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 hora sin actividad y todo desaparece —\\nmensajes, sala, historial. Como si nunca\\nhubiera existido."
           }
         }
       }

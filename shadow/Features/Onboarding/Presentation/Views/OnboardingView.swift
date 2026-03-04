@@ -85,6 +85,7 @@ struct OnboardingView: View {
                     .id("step3")
                 }
             }
+            .padding(.horizontal, 24)
         }
         .safeAreaInset(edge: .top) {
             OnboardingTopBar(
