@@ -12,7 +12,7 @@ struct HomeTopBar: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Shadow")
+                Text(LocalizedStringKey("Shadow"))
                     .textStyle(
                         .displayLarge,
                         color: .color(.accentYellow),
@@ -23,16 +23,12 @@ struct HomeTopBar: View {
                     Circle()
                         .frame(width: 6, height: 6)
                         .foregroundStyle(.accentYellow)
-                    
-                    Text("Cifrado •")
+
+                    Text("home.topbar.security_features")
                         .textStyle(
                             .monoMicro,
                             family: .jetbrainsRegular
                         )
-                    Text("Efimero •")
-                        .textStyle(.monoMicro, family: .jetbrainsRegular)
-                    Text("Sin Rastro")
-                        .textStyle(.monoMicro, family: .jetbrainsRegular)
                 }
             }
 
