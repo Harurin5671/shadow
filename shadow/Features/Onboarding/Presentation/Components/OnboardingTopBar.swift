@@ -28,8 +28,6 @@ struct OnboardingTopBar: View {
                 HStack(spacing: 4) {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 14, weight: .semibold))
-                    Text("Back")
-                        .font(.system(size: 14, weight: .medium))
                 }
                 .foregroundStyle(.clear)
             }

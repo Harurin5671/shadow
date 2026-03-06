@@ -49,7 +49,11 @@ struct OnboardingStep3View: View {
             Spacer()
                 .frame(height: 24)
 
-            OnboardingCTAButton(step: 3, totalSteps: 3, action: onFinished)
+            AppButton(
+                label: LocalizedStringKey("onboarding.step.finishBtn"),
+                action: onFinished,
+                trailingIcon: "checkmark"
+            )
 
         }
     }

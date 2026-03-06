@@ -12,7 +12,7 @@ struct OnboardingProgressBar: View {
     let current: Int
     let total: Int
 
-    var progreso: Double {
+    var progress: Double {
         Double(current) / Double(total)
     }
 
@@ -28,8 +28,8 @@ struct OnboardingProgressBar: View {
                 // Progreso lleno
                 Rectangle()
                     .fill(Color.accentYellow)
-                    .frame(width: geo.size.width * progreso, height: 2)
-                    .animation(.easeInOut(duration: 0.3), value: progreso)
+                    .frame(width: geo.size.width * progress, height: 2)
+                    .animation(.easeInOut(duration: 0.3), value: progress)
             }
         }
         .frame(height: 2)

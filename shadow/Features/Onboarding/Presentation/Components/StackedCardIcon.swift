@@ -41,13 +41,10 @@ struct StackedCardIcon: View {
 
     var body: some View {
         ZStack(alignment: .center) {
-            // Atrás
             cardLayer(size: cardSize, rotation: backRotation, opacity: 0.6)
 
-            // Medio
             cardLayer(size: cardSize, rotation: midRotation, opacity: 0.6)
 
-            // Frontal
             RoundedRectangle(cornerRadius: 2)
                 .fill(Color(hex: "#21230F").opacity(0.50))
                 .frame(width: cardSize * 0.833, height: cardSize * 0.833)
@@ -56,14 +53,12 @@ struct StackedCardIcon: View {
                         .stroke(accentColor, lineWidth: 2)
                 )
 
-            // Ícono
             resolvedIcon
                 .foregroundColor(accentColor)
         }
     }
 
     // MARK: - Private
-
     private func cardLayer(size: CGFloat, rotation: Double, opacity: Double) -> some View {
         RoundedRectangle(cornerRadius: 2)
             .fill(accentColor.opacity(0.05))

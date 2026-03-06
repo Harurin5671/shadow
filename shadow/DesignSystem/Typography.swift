@@ -13,6 +13,7 @@ enum AppFontFamily {
     case syneBold
     case jetbrains
     case jetbrainsLight
+    case jetbrainsRegular
     case spaceGrotesk
     case spaceGroteskRegular
 }
@@ -70,6 +71,9 @@ struct AppTypography {
                 
             case .jetbrainsLight:
                 return "JetBrainsMono-Light"
+                
+            case .jetbrainsRegular:
+                return "JetBrainsMono-Regular"
 
             case .spaceGrotesk:
                 return "SpaceGrotesk-Bold"

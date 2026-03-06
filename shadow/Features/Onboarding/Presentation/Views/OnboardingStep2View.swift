@@ -76,8 +76,12 @@ struct OnboardingStep2View: View {
             OnboardingProgressBar(current: 2, total: 3)
 
             Spacer().frame(height: 32)
-
-            OnboardingCTAButton(step: 2, totalSteps: 3, action: onNext)
+            
+            AppButton(
+                label: LocalizedStringKey("onboarding.step.nextBtn"),
+                action: onNext,
+                trailingIcon: "arrow.right"
+            )
         }
     }
 }
