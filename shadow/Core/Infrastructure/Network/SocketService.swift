@@ -40,12 +40,16 @@ final class SocketService {
         guard !isConnected else { return }
 
         let socketURL = URL(string: url)!
-        manager = SocketManager(socketURL: socketURL, config: [
-            .log(false),
-            .compress,
-            .reconnects(true),
-            .reconnectWait(2),
-        ])
+        manager = SocketManager(
+            socketURL: socketURL,
+            config: [
+                .log(false),
+                .compress,
+                .reconnects(true),
+                .reconnectWait(2),
+                .reconnectAttempts(3),
+            ]
+        )
 
         socket = manager?.defaultSocket
 
@@ -74,8 +78,10 @@ final class SocketService {
             print("🔌 iOS desconectado del servidor")
         }
 
-        socket?.on(clientEvent: .error) { _, data in
-            print("❌ Socket error:", data)
+        socket?.on(clientEvent: .error) { data, _ in
+            if let error = data.first {
+                print("❌ Socket error:", error)
+            }
         }
 
         // Registra todos los eventos del servidor
@@ -87,7 +93,7 @@ final class SocketService {
             .keyReceive,
             .securityAlert, .deadManConfirmed, .deadManWarning,
             .typingStart, .typingStop,
-            .error
+            .error,
         ] {
             socket?.on(event.rawValue) { [weak self] data, _ in
                 self?.handlers[event.rawValue]?(data)
@@ -125,7 +131,7 @@ final class SocketService {
 
     func decode<T: Decodable>(_ type: T.Type, from data: [Any]) -> T? {
         guard let dict = data.first as? [String: Any],
-              let jsonData = try? JSONSerialization.data(withJSONObject: dict)
+            let jsonData = try? JSONSerialization.data(withJSONObject: dict)
         else { return nil }
 
         return try? JSONDecoder().decode(type, from: jsonData)
