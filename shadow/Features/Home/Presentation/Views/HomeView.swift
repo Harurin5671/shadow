@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct HomeView: View {
+    @Environment(AppRouter.self) private var router: AppRouter
+
     var body: some View {
         ZStack {
             Color.bgPrimary
@@ -49,14 +51,14 @@ struct HomeView: View {
             VStack(spacing: 12) {
                 AppButton(
                     label: LocalizedStringKey("home.action.create_room"),
-                    action: {},
+                    action: { router.showRoomCreation() },
                     layout: .center,
                     leadingIcon: "plus"
                 )
 
                 AppButton(
                     label: LocalizedStringKey("home.action.join_with_code"),
-                    action: {},
+                    action: { router.goToRoomJoin() },
                     layout: .center,
                     leadingIcon: "qrcode",
                     foregroundColor: .white,
@@ -89,4 +91,5 @@ struct HomeView: View {
 
 #Preview {
     HomeView()
+        .environment(AppRouter())
 }

@@ -11,14 +11,32 @@ struct AppView: View {
     @Environment(AppRouter.self) private var router
 
     var body: some View {
+        @Bindable var router = router
+        
         Group {
             switch router.currentScreen {
             case .onboarding:
                 OnboardingView()
                     .transition(.opacity)
             case .main:
-                HomeView()
-                    .transition(.opacity)
+                NavigationStack(path: $router.navigationPath) {
+                    HomeView()
+                        .navigationDestination(for: AppRouter.Destination.self)
+                    { dest in
+                        switch dest {
+                        case .roomJoin:
+                            RoomJoinView()
+                        case .chat(let roomCode):
+                            ChatView(roomCode: roomCode)
+                        case .settings:
+                            SettingsView()
+                        }
+                    }
+                }
+                .sheet(isPresented: $router.isShowingRoomCreation) {
+                    RoomCreationView()
+                }
+                .transition(.opacity)
             }
         }
         .animation(.easeInOut(duration: 0.35), value: router.currentScreen)
@@ -27,4 +45,5 @@ struct AppView: View {
 
 #Preview {
     AppView()
+        .environment(AppRouter())
 }

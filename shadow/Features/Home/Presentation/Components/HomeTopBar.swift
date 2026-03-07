@@ -9,6 +9,8 @@ import Foundation
 import SwiftUI
 
 struct HomeTopBar: View {
+    @Environment(AppRouter.self) private var router
+    
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
@@ -34,7 +36,11 @@ struct HomeTopBar: View {
 
             Spacer()
 
-            Image("settings")
+            Button {
+                router.goToSettings()
+            } label: {
+                Image("settings")
+            }
         }
         .padding(.horizontal, 24)
     }

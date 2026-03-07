@@ -11,10 +11,15 @@ import SwiftUI
 struct shadowApp: App {
     @State private var router = AppRouter()
     
+    init() {
+        SocketService.shared.connect(url: "http://localhost:3000")
+    }
+    
     var body: some Scene {
         WindowGroup {
             AppView()
                 .environment(router)
+                .environment(SocketService.shared)
                 .preferredColorScheme(ColorScheme.dark)
         }
     }
