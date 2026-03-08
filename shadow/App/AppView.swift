@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AppView: View {
     @Environment(AppRouter.self) private var router
+    @State private var homeViewModel = HomeViewModel.shared
     private let socket = SocketService.shared
 
     var body: some View {
@@ -50,6 +51,7 @@ struct AppView: View {
         }
         .animation(.easeInOut(duration: 0.35), value: socket.isConnected)
         .animation(.easeInOut(duration: 0.35), value: router.currentScreen)
+        .environment(SocketService.shared)
     }
 }
 

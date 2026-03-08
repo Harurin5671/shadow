@@ -82,6 +82,7 @@ struct RoomCreatedPayload: Decodable {
     let socketId: String
     let participantCount: Int
     let createdAt: String
+    let expiresInSeconds: Int
 }
 
 struct RoomJoinedPayload: Decodable {
@@ -95,13 +96,24 @@ struct MyRoomsPayload: Decodable {
     let count: Int
 }
 
-struct RoomInfo: Decodable, Identifiable {
+struct RoomInfo: Decodable, Identifiable, Equatable {
     var id: String { code }
     let code: String
     let participantCount: Int
     let createdAt: String
     let myRole: String      // "creator" o "participant"
     let isGhost: Bool
+    let expiresInSeconds: Int
+    
+    static func == (lhs: RoomInfo, rhs: RoomInfo) -> Bool {
+        return lhs.id == rhs.id &&
+               lhs.code == rhs.code &&
+               lhs.participantCount == rhs.participantCount &&
+               lhs.createdAt == rhs.createdAt &&
+               lhs.myRole == rhs.myRole &&
+               lhs.isGhost == rhs.isGhost &&
+               lhs.expiresInSeconds == rhs.expiresInSeconds
+    }
 }
 
 struct RoomDestroyedPayload: Decodable {
@@ -111,11 +123,13 @@ struct RoomDestroyedPayload: Decodable {
 }
 
 struct ParticipantJoinedPayload: Decodable {
+    let roomCode: String
     let alias: String
     let participantCount: Int
 }
 
 struct ParticipantLeftPayload: Decodable {
+    let roomCode: String
     let alias: String
     let participantCount: Int
 }
