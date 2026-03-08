@@ -28,6 +28,11 @@ final class RoomRepository: RoomRepositoryProtocol {
     var isLoading: Bool = false
     private var isLoadingRooms: Bool = false
     
+    // IDs for socket listeners
+    private var myRoomsId: UUID?
+    private var participantJoinedId: UUID?
+    private var participantLeftId: UUID?
+    
     init(socketService: SocketServiceProtocol) {
         self.socketService = socketService
     }
@@ -55,7 +60,7 @@ final class RoomRepository: RoomRepositoryProtocol {
         // Clear existing handlers before adding new ones
         stopListening()
         
-        socketService.on(.myRooms) { [weak self] data in
+        myRoomsId = socketService.on(.myRooms) { [weak self] data in
             guard let self = self else { return }
             guard let payload = self.socketService.decode(MyRoomsPayload.self, from: data) else { return }
             
@@ -66,14 +71,14 @@ final class RoomRepository: RoomRepositoryProtocol {
             }
         }
         
-        socketService.on(.participantJoined) { [weak self] data in
+        participantJoinedId = socketService.on(.participantJoined) { [weak self] data in
             guard let self = self else { return }
             guard let payload = self.socketService.decode(ParticipantJoinedPayload.self, from: data) else { return }
             
             self.updateParticipantCount(roomCode: payload.roomCode, newCount: payload.participantCount)
         }
         
-        socketService.on(.participantLeft) { [weak self] data in
+        participantLeftId = socketService.on(.participantLeft) { [weak self] data in
             guard let self = self else { return }
             guard let payload = self.socketService.decode(ParticipantLeftPayload.self, from: data) else { return }
             
@@ -82,9 +87,13 @@ final class RoomRepository: RoomRepositoryProtocol {
     }
     
     func stopListening() {
-        socketService.off(.myRooms)
-        socketService.off(.participantJoined)
-        socketService.off(.participantLeft)
+        if let id = myRoomsId { socketService.off(.myRooms, id: id) }
+        if let id = participantJoinedId { socketService.off(.participantJoined, id: id) }
+        if let id = participantLeftId { socketService.off(.participantLeft, id: id) }
+        
+        myRoomsId = nil
+        participantJoinedId = nil
+        participantLeftId = nil
     }
     
     func removeRoom(withCode code: String) {

@@ -16,8 +16,9 @@ protocol SocketServiceProtocol {
     func disconnect()
     
     func emit(_ event: SocketEmitEvent, _ data: [String: Any])
-    func on(_ event: SocketOnEvent, handler: @escaping ([Any]) -> Void)
-    func off(_ event: SocketOnEvent)
+    @discardableResult
+    func on(_ event: SocketOnEvent, handler: @escaping ([Any]) -> Void) -> UUID
+    func off(_ event: SocketOnEvent, id: UUID)
     
     func decode<T: Decodable>(_ type: T.Type, from data: [Any]) -> T?
 }

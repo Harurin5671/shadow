@@ -23,7 +23,7 @@ struct ChatView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
-                    router.goBack()
+                    router.returnToHome()
                 } label: {
                     Image(systemName: "chevron.left")
                         .foregroundStyle(Color.textPrimary)

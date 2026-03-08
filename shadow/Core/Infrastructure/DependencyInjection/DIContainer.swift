@@ -15,10 +15,20 @@ final class DIContainer {
     
     let socketService: SocketService
     let roomRepository: RoomRepository
+    let localNotificationService: LocalNotificationServiceProtocol
+    let notificationManager: NotificationManager
     
     private init() {
         self.socketService = SocketService.shared
         self.roomRepository = RoomRepository(socketService: self.socketService)
+        self.localNotificationService = LocalNotificationService()
+        self.notificationManager = NotificationManager(
+            socketService: self.socketService,
+            notificationService: self.localNotificationService
+        )
+        
+        // Empezar a escuchar las notificaciones en el manager central
+        self.notificationManager.startListening()
     }
 }
 

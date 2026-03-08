@@ -71,6 +71,7 @@ final class RoomCreationViewModel {
 
     // MARK: - Dependencies
     private let socket: SocketServiceProtocol
+    private var roomCreatedHandlerId: UUID?
 
     init(socket: SocketServiceProtocol = DIContainer.shared.socketService) {
         self.socket = socket
@@ -108,8 +109,11 @@ final class RoomCreationViewModel {
         errorMessage = nil
 
         // Escuchar respuesta del servidor
-        socket.off(.roomCreated)  // Limpiar handler existente
-        socket.on(.roomCreated) { [weak self] data in
+        if let id = roomCreatedHandlerId {
+            socket.off(.roomCreated, id: id)
+            roomCreatedHandlerId = nil
+        }
+        roomCreatedHandlerId = socket.on(.roomCreated) { [weak self] data in
             guard let self else { return }
             print("[RoomCreationViewModel] Received .roomCreated event with data: \(data)")
             guard
@@ -176,7 +180,17 @@ final class RoomCreationViewModel {
     }
 
     func dismiss() {
+        if let id = roomCreatedHandlerId {
+            socket.off(.roomCreated, id: id)
+            roomCreatedHandlerId = nil
+        }
         onDismiss?()
+    }
+    
+    deinit {
+        if let id = roomCreatedHandlerId {
+            socket.off(.roomCreated, id: id)
+        }
     }
 
     // MARK: - Helpers

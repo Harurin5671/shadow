@@ -29,7 +29,9 @@ final class AppRouter {
     }
     
     func goToChat(roomCode: String) {
-        navigationPath.append(.chat(roomCode: roomCode))
+        // Al ir al chat, limpiamos la pila para que al retroceder
+        // el usuario siempre regrese al Home, y no al formulario de unirse.
+        navigationPath = [.chat(roomCode: roomCode)]
     }
     
     func goToSettings() {
@@ -37,7 +39,13 @@ final class AppRouter {
     }
     
     func goBack() {
-        navigationPath.removeLast()
+        if !navigationPath.isEmpty {
+            navigationPath.removeLast()
+        }
+    }
+    
+    func returnToHome() {
+        navigationPath.removeAll()
     }
     
     func showRoomCreation() {
