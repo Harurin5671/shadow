@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+private let RCLog = "[RoomCreationConfigView]"
+
 // Paso 2 — Configurar sala
 
 struct RoomCreationConfigView: View {
@@ -15,11 +17,17 @@ struct RoomCreationConfigView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            Color.clear.frame(height: 0).onAppear {
+                print("\(RCLog) appeared. vm.isLoading=\(vm.isLoading) maxParticipants=\(vm.maxParticipants) passwordEnabled=\(vm.passwordEnabled) deadManEnabled=\(vm.deadManEnabled) burnTimerEnabled=\(vm.burnTimerEnabled) ghostModeEnabled=\(vm.ghostModeEnabled)")
+            }
 
             // ── Top bar ──────────────────────────────────────
             RoomCreationTopBar(
                 title: "CONFIGURE",
-                onBack: { vm.goBackToAlias() },
+                onBack: { 
+                    print("\(RCLog) Back pressed -> goBackToAlias()")
+                    vm.goBackToAlias()
+                },
             )
 
             // ── Opciones ─────────────────────────────────────
@@ -35,6 +43,7 @@ struct RoomCreationConfigView: View {
                         HStack(spacing: 16) {
                             Button {
                                 if vm.maxParticipants > 2 { vm.maxParticipants -= 1 }
+                                print("\(RCLog) maxParticipants decreased -> \(vm.maxParticipants)")
                             } label: {
                                 Image(systemName: "minus")
                                     .foregroundStyle(Color.textPrimary)
@@ -50,6 +59,7 @@ struct RoomCreationConfigView: View {
 
                             Button {
                                 if vm.maxParticipants < 20 { vm.maxParticipants += 1 }
+                                print("\(RCLog) maxParticipants increased -> \(vm.maxParticipants)")
                             } label: {
                                 Image(systemName: "plus")
                                     .foregroundStyle(Color.textPrimary)
@@ -67,15 +77,23 @@ struct RoomCreationConfigView: View {
                         subtitle: "Extra protection beyond the 4-char code",
                         isEnabled: $vm.passwordEnabled
                     ) {
-                        SecureField("Enter password", text: $vm.password)
-                            .textStyle(.monoMicro, family: .jetbrainsRegular)
-                            .foregroundStyle(Color.textPrimary)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 12)
-                            .background(Color.bgElevated)
-                            .overlay(Rectangle().stroke(Color.borderSubtle, lineWidth: 1))
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.never)
+                        Group {
+                            SecureField("Enter password", text: $vm.password)
+                                .textStyle(.monoMicro, family: .jetbrainsRegular)
+                                .foregroundStyle(Color.textPrimary)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                                .background(Color.bgElevated)
+                                .overlay(Rectangle().stroke(Color.borderSubtle, lineWidth: 1))
+                                .autocorrectionDisabled()
+                                .textInputAutocapitalization(.never)
+                        }
+                        .onChange(of: vm.password) { old, new in
+                            print("\(RCLog) password changed. length=\(new.count)")
+                        }
+                    }
+                    .onChange(of: vm.passwordEnabled) { old, new in
+                        print("\(RCLog) passwordEnabled toggled -> \(new)")
                     }
 
                     // Dead man's switch
@@ -92,6 +110,9 @@ struct RoomCreationConfigView: View {
                             accentColor: Color.danger
                         )
                     }
+                    .onChange(of: vm.deadManEnabled) { old, new in
+                        print("\(RCLog) deadManEnabled toggled -> \(new)")
+                    }
 
                     // Burn timer por defecto
                     ConfigSection(
@@ -106,6 +127,9 @@ struct RoomCreationConfigView: View {
                             accentColor: Color.accentYellow
                         )
                     }
+                    .onChange(of: vm.burnTimerEnabled) { old, new in
+                        print("\(RCLog) burnTimerEnabled toggled -> \(new)")
+                    }
 
                     // Modo fantasma
                     ConfigRow(
@@ -116,6 +140,9 @@ struct RoomCreationConfigView: View {
                         Toggle("", isOn: $vm.ghostModeEnabled)
                             .tint(Color.accentYellow)
                             .labelsHidden()
+                            .onChange(of: vm.ghostModeEnabled) { old, new in
+                                print("\(RCLog) ghostModeEnabled -> \(new)")
+                            }
                     }
                 }
                 .padding(.horizontal, 24)
@@ -124,6 +151,7 @@ struct RoomCreationConfigView: View {
 
             // ── Error ────────────────────────────────────────
             if let error = vm.errorMessage {
+//                print("\(RCLog) errorMessage appeared: \(error)")
                 Text(error)
                     .textStyle(.monoMicro, family: .jetbrainsRegular)
                     .foregroundStyle(Color.danger)
@@ -134,7 +162,11 @@ struct RoomCreationConfigView: View {
             // ── Botón crear ──────────────────────────────────
             AppButton(
                 label: vm.isLoading ? "CREATING..." : "CREATE ROOM",
-                action: { vm.createRoom() },
+                action: { 
+                    print("\(RCLog) CREATE ROOM tapped. isLoading(before)=\(vm.isLoading)")
+                    vm.createRoom()
+                    print("\(RCLog) createRoom() called. isLoading(after)=\(vm.isLoading)")
+                },
                 layout: .center,
                 leadingIcon: vm.isLoading ? nil : "plus"
             )
@@ -142,6 +174,9 @@ struct RoomCreationConfigView: View {
             .opacity(vm.isLoading ? 0.6 : 1.0)
             .padding(.horizontal, 24)
             .padding(.bottom, 32)
+        }
+        .onChange(of: vm.isLoading) { old, new in
+            print("\(RCLog) isLoading changed -> \(new)")
         }
     }
 }
@@ -242,6 +277,7 @@ where T.RawValue == Int, T: Hashable {
                     let isSelected = selected == option
                     Button {
                         selected = option
+                        print("[IntervalPicker] selection changed to: \(option)")
                     } label: {
                         Text((option as? DeadManInterval)?.label ?? (option as? BurnTimer)?.label ?? "")
                             .textStyle(.monoMicro, family: .jetbrainsRegular)
