@@ -10,7 +10,14 @@ import SwiftUI
 struct HomeView: View {
     @Environment(AppRouter.self) private var router: AppRouter
     @Environment(SocketService.self) private var socket: SocketService
-    private let viewModel = HomeViewModel.shared
+    @State private var viewModel: HomeViewModel
+    
+    init() {
+        _viewModel = State(initialValue: HomeViewModel(
+            roomRepository: DIContainer.shared.roomRepository,
+            socketService: DIContainer.shared.socketService
+        ))
+    }
     
     // Estado para el tiempo restante de cada sala
     @State private var roomTimes: [String: Int] = [:]
@@ -67,7 +74,7 @@ struct HomeView: View {
                     // Si expira, remover de la lista
                     roomTimes.removeValue(forKey: roomCode)
                     // También remover del viewModel
-                    viewModel.rooms.removeAll { $0.code == roomCode }
+                    viewModel.removeRoom(withCode: roomCode)
                 }
             }
         }
@@ -218,7 +225,7 @@ struct HomeView: View {
                 print("[HomeView] Adding new room immediately: \(newRoom.code) with expires in \(newRoom.expiresInSeconds)s")
                 // Agregar la sala inmediatamente para feedback instantáneo
                 if !viewModel.rooms.contains(where: { $0.code == newRoom.code }) {
-                    viewModel.rooms.insert(newRoom, at: 0) // Insertar al principio
+                    viewModel.insertRoom(newRoom, at: 0) // Insertar al principio
                     // Actualizar tiempos inmediatamente
                     if newRoom.expiresInSeconds > 0 {
                         roomTimes[newRoom.code] = newRoom.expiresInSeconds
@@ -242,6 +249,7 @@ struct HomeView: View {
         .onAppear {
             print("[HomeView] onAppear - updating room times")
             updateRoomTimes()
+            viewModel.onAppear()
         }
         .onChange(of: viewModel.rooms) { oldValue, newValue in
             print("[HomeView] Rooms changed from \(oldValue.count) to \(newValue.count)")
@@ -251,6 +259,7 @@ struct HomeView: View {
             print("[HomeView] onDisappear - cleaning up timer")
             timer?.invalidate()
             timer = nil
+            viewModel.onDisappear()
         }
     }
 }
@@ -368,5 +377,5 @@ struct ActiveRoomCard: View {
 #Preview {
     HomeView()
         .environment(AppRouter())
-        .environment(SocketService.shared)
+        .environment(DIContainer.shared.socketService)
 }

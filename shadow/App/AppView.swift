@@ -9,8 +9,7 @@ import SwiftUI
 
 struct AppView: View {
     @Environment(AppRouter.self) private var router
-    @State private var homeViewModel = HomeViewModel.shared
-    private let socket = SocketService.shared
+    @Environment(SocketService.self) private var socket
 
     var body: some View {
         @Bindable var router = router
@@ -18,7 +17,7 @@ struct AppView: View {
         Group {
             if !socket.isConnected {
                 NoConnectionView(onRetry: {
-                    SocketService.shared.connect()
+                    socket.connect()
                 })
                 .transition(.opacity)
             } else {
@@ -51,11 +50,11 @@ struct AppView: View {
         }
         .animation(.easeInOut(duration: 0.35), value: socket.isConnected)
         .animation(.easeInOut(duration: 0.35), value: router.currentScreen)
-        .environment(SocketService.shared)
     }
 }
 
 #Preview {
     AppView()
         .environment(AppRouter())
+        .environment(DIContainer.shared.socketService)
 }

@@ -16,7 +16,7 @@ import SocketIO
 // el estado de conexion. Como ChangeNotifier en Flutter.
 
 @Observable
-final class SocketService {
+final class SocketService: SocketServiceProtocol {
     private let logPrefix = "[SocketService]"
 
     // MARK: - Estado de conexion

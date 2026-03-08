@@ -69,8 +69,12 @@ final class RoomCreationViewModel {
     var isLoading: Bool = false
     var errorMessage: String? = nil
 
-    // MARK: - Socket
-    private let socket = SocketService.shared
+    // MARK: - Dependencies
+    private let socket: SocketServiceProtocol
+
+    init(socket: SocketServiceProtocol = DIContainer.shared.socketService) {
+        self.socket = socket
+    }
 
     var onDismiss: (() -> Void)?
     var onRoomCreated: (() -> Void)?
