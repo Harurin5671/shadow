@@ -104,7 +104,7 @@ final class SocketService: SocketServiceProtocol {
         // para despacharlos a los handlers registrados
         for event in [
             SocketOnEvent.roomCreated, .roomJoined, .roomDestroyed,
-            .myRooms,
+            .myRooms, .roomMessages,
             .participantJoined, .participantLeft,
             .messageReceive, .messageSent,
             .keyReceive,

@@ -21,6 +21,7 @@ enum SocketEmitEvent: String {
     case roomCreate   = "room:create"
     case roomJoin     = "room:join"
     case roomGetMyRooms = "room:getMyRooms"
+    case roomGetMessages = "room:getMessages"
     case roomDestroy  = "room:destroy"
 
     // Mensajes
@@ -46,6 +47,7 @@ enum SocketOnEvent: String {
     case roomCreated      = "room:created"
     case roomJoined       = "room:joined"
     case myRooms          = "room:myRooms"
+    case roomMessages     = "room:messages"
     case roomDestroyed    = "room:destroyed"
     case roomExpired      = "room:expired"
 
@@ -137,6 +139,21 @@ struct ParticipantLeftPayload: Decodable {
 struct MessageReceivePayload: Decodable {
     let id: String
     let encryptedPayload: String  // base64
+    let senderAlias: String
+    let sentAt: String
+    let burnAfter: Int?
+}
+
+struct RoomMessagesPayload: Decodable {
+    let roomCode: String
+    let messages: [RoomMessagePayload]
+    let count: Int
+}
+
+struct RoomMessagePayload: Decodable, Identifiable {
+    let id: String
+    let roomCode: String
+    let encryptedPayload: String
     let senderAlias: String
     let sentAt: String
     let burnAfter: Int?
