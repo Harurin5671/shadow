@@ -10,15 +10,17 @@ import SwiftUI
 @main
 struct shadowApp: App {
     @State private var router = AppRouter()
+    private let diContainer = DIContainer.shared
     
     var body: some Scene {
         WindowGroup {
             AppView()
                 .environment(router)
-                .environment(SocketService.shared)
+                .environment(diContainer.socketService)
+                .environment(diContainer.roomRepository)
                 .preferredColorScheme(ColorScheme.dark)
                 .task {
-                    SocketService.shared.connect(url: "http://localhost:3000")
+                    diContainer.socketService.connect(url: AppConfig.apiBaseURL)
                 }
         }
     }

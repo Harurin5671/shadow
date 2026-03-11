@@ -43,6 +43,7 @@ final class RoomCreationViewModel {
 
     // MARK: - Paso 2: Configuración
     var maxParticipants: Int = 10
+    var roomExpirationHours: Int = 1 // 1 hora por defecto
 
     // Contraseña
     var passwordEnabled: Bool = false
@@ -68,10 +69,19 @@ final class RoomCreationViewModel {
     var isLoading: Bool = false
     var errorMessage: String? = nil
 
-    // MARK: - Socket
-    private let socket = SocketService.shared
+    // MARK: - Dependencies
+    private let socket: SocketServiceProtocol
+    private let cryptoManager: CryptoManager
+    private var roomCreatedHandlerId: UUID?
+
+    init(socket: SocketServiceProtocol = DIContainer.shared.socketService, cryptoManager: CryptoManager? = nil) {
+        self.socket = socket
+        self.cryptoManager = cryptoManager ?? DIContainer.shared.cryptoManager
+    }
 
     var onDismiss: (() -> Void)?
+    var onRoomCreated: (() -> Void)?
+    var onRoomCreatedWithData: ((RoomInfo) -> Void)?
 
     // MARK: - Paso 1 → 2
 
@@ -91,19 +101,30 @@ final class RoomCreationViewModel {
     // MARK: - Paso 2 → 3: Crear sala en el servidor
 
     func createRoom() {
-        guard !isLoading else { return }
+        guard !isLoading else { 
+            print("[RoomCreationViewModel] createRoom() called but already loading")
+            return 
+        }
+        
+        print("[RoomCreationViewModel] createRoom() starting...")
         isLoading = true
         errorMessage = nil
 
         // Escuchar respuesta del servidor
-        socket.on(.roomCreated) { [weak self] data in
+        if let id = roomCreatedHandlerId {
+            socket.off(.roomCreated, id: id)
+            roomCreatedHandlerId = nil
+        }
+        roomCreatedHandlerId = socket.on(.roomCreated) { [weak self] data in
             guard let self else { return }
+            print("[RoomCreationViewModel] Received .roomCreated event with data: \(data)")
             guard
                 let payload = self.socket.decode(
                     RoomCreatedPayload.self,
                     from: data
                 )
             else {
+                print("[RoomCreationViewModel] Failed to decode RoomCreatedPayload")
                 self.isLoading = false
                 self.errorMessage = "Could not create room. Try again."
                 return
@@ -113,6 +134,34 @@ final class RoomCreationViewModel {
             self.mySocketId = payload.socketId
             self.roomFingerprint = Self.generateFingerprint(from: payload.code)
             self.isLoading = false
+            
+            // Crear RoomInfo con los datos de la sala recién creada
+            let newRoom = RoomInfo(
+                code: payload.code,
+                participantCount: payload.participantCount,
+                createdAt: payload.createdAt,
+                myRole: "creator",
+                isGhost: ghostModeEnabled,
+                expiresInSeconds: roomExpirationHours * 3600 // Convertir horas a segundos
+            )
+            
+            print("[RoomCreationViewModel] Room created successfully! Code: \(payload.code)")
+            
+            // Setup crypto como creator
+            cryptoManager.setupAsCreator(for: payload.code, alias: self.alias)
+
+            // Emitir clave pública del creator al room para iniciar key exchange
+            cryptoManager.emitMyPublicKey(for: payload.code, alias: self.displayAlias)
+            
+            self.onRoomCreated?()
+            self.onRoomCreatedWithData?(newRoom)
+            
+            // Pequeño delay para asegurar que Redis guarde la sala antes de notificar
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                print("[RoomCreationViewModel] Notifying room created after delay...")
+                // Notificar a otros componentes que se creó una sala
+                NotificationCenter.default.post(name: .roomCreated, object: newRoom)
+            }
 
             withAnimation(.easeInOut(duration: 0.25)) {
                 self.currentStep = .created
@@ -135,11 +184,22 @@ final class RoomCreationViewModel {
             roomData["defaultBurnAfter"] = burnTimer.seconds
         }
 
+        print("[RoomCreationViewModel] Emitting room:create with data: \(roomData)")
         socket.emit(.roomCreate, roomData)
     }
 
     func dismiss() {
+        if let id = roomCreatedHandlerId {
+            socket.off(.roomCreated, id: id)
+            roomCreatedHandlerId = nil
+        }
         onDismiss?()
+    }
+    
+    deinit {
+        if let id = roomCreatedHandlerId {
+            socket.off(.roomCreated, id: id)
+        }
     }
 
     // MARK: - Helpers

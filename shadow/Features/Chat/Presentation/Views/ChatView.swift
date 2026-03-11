@@ -11,19 +11,92 @@ struct ChatView: View {
 
     let roomCode: String
     @Environment(AppRouter.self) private var router
+    @State private var viewModel: ChatViewModel
+    
+    init(roomCode: String) {
+        self.roomCode = roomCode
+        self._viewModel = State(initialValue: ChatViewModel(roomCode: roomCode))
+    }
 
     var body: some View {
         ZStack {
             Color.bgPrimary.ignoresSafeArea()
 
-            Text("Hello Chat — \(roomCode)")
-                .foregroundStyle(Color.textPrimary)
+            VStack {
+                Text("Room Code: \(roomCode)")
+                    .font(.headline)
+                    .foregroundStyle(Color.textPrimary)
+                    .padding(.top)
+
+                if viewModel.isLoading {
+                    Spacer()
+                    ProgressView()
+                        .tint(.textPrimary)
+                    Spacer()
+                } else if let error = viewModel.errorMessage {
+                    Spacer()
+                    Text(error)
+                        .foregroundStyle(.red)
+                    Spacer()
+                } else if viewModel.messages.isEmpty {
+                    Spacer()
+                    Text("No messages yet...")
+                        .foregroundStyle(.gray)
+                    Spacer()
+                } else {
+                    ScrollView {
+                        LazyVStack(spacing: 12) {
+                            ForEach(viewModel.messages) { message in
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(message.senderAlias)
+                                        .font(.caption)
+                                        .foregroundStyle(.gray)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    
+                                    Text(viewModel.decryptMessage(message.encryptedPayload) ?? message.encryptedPayload)
+                                        .padding()
+                                        .background(Color.white.opacity(0.1))
+                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                                        .foregroundStyle(Color.textPrimary)
+                                }
+                                .padding(.horizontal)
+                            }
+                        }
+                        .padding(.vertical)
+                    }
+                }
+                
+                // Message input
+                VStack(spacing: 12) {
+                    HStack(spacing: 12) {
+                        TextField("Type a message...", text: $viewModel.messageInput)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .foregroundStyle(Color.textPrimary)
+                        
+                        Button(action: {
+                            if !viewModel.messageInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                viewModel.sendMessage(message: viewModel.messageInput, senderAlias: "User")
+                                viewModel.messageInput = ""
+                            }
+                        }) {
+                            Image(systemName: "paperplane.fill")
+                                .foregroundStyle(Color.accentYellow)
+                        }
+                        .disabled(viewModel.messageInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
+                    .padding(.horizontal)
+                }
+                .padding(.bottom)
+            }
+        }
+        .onAppear {
+            viewModel.onAppear()
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
-                    router.goBack()
+                    router.returnToHome()
                 } label: {
                     Image(systemName: "chevron.left")
                         .foregroundStyle(Color.textPrimary)

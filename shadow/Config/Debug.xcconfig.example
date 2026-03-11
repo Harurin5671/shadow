@@ -1,0 +1,11 @@
+//
+//  Debug.xcconfig.example
+//  shadow
+//
+//  Created by Frank Erick Santos Gonzales on 11/03/26.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://developer.apple.com/documentation/xcode/adding-a-build-configuration-file-to-your-project
+
+API_BASE_URL = http:$()/$()/localhost:3000

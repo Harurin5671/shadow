@@ -38,8 +38,9 @@ struct RoomCreationView: View {
                 RoomCreatedView(
                     vm: vm,
                     onDone: {
+                        print("[RoomCreationView] ENTER ROOM tapped - navigating to chat with code: \(vm.roomCode)")
                         router.dismissRoomCreation()
-                        // router.goToChat(roomCode: vm.roomCode)
+                        router.goToChat(roomCode: vm.roomCode)
                     }
                 )
                 .transition(

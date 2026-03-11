@@ -16,7 +16,7 @@ import SocketIO
 // el estado de conexion. Como ChangeNotifier en Flutter.
 
 @Observable
-final class SocketService {
+final class SocketService: SocketServiceProtocol {
     private let logPrefix = "[SocketService]"
 
     // MARK: - Estado de conexion
@@ -29,7 +29,7 @@ final class SocketService {
 
     // MARK: - Callbacks registrados por los ViewModels
     // Equivalente a los StreamControllers en Flutter
-    private var handlers: [String: ([Any]) -> Void] = [:]
+    private var handlers: [String: [UUID: ([Any]) -> Void]] = [:]
 
     // MARK: - Singleton
     static let shared = SocketService()
@@ -37,7 +37,7 @@ final class SocketService {
 
     // MARK: - Conexion
 
-    func connect(url: String = "http://localhost:3000") {
+    func connect(url: String = AppConfig.apiBaseURL) {
         print(
             "\(logPrefix) connect() called with url=\(url). isConnected=\(isConnected)"
         )
@@ -104,10 +104,10 @@ final class SocketService {
         // para despacharlos a los handlers registrados
         for event in [
             SocketOnEvent.roomCreated, .roomJoined, .roomDestroyed,
-            .myRooms,
+            .myRooms, .roomMessages,
             .participantJoined, .participantLeft,
             .messageReceive, .messageSent,
-            .keyReceive,
+            .keyReceive, .roomKeyReceive,
             .securityAlert, .deadManConfirmed, .deadManWarning,
             .typingStart, .typingStop,
             .error,
@@ -116,7 +116,11 @@ final class SocketService {
                 print(
                     "\(self?.logPrefix ?? "[SocketService]") on(\(event.rawValue)) received with \(data.count) item(s). first=\(String(describing: data.first))"
                 )
-                self?.handlers[event.rawValue]?(data)
+                
+                // Disparar a todos los listeners registrados
+                self?.handlers[event.rawValue]?.values.forEach { handler in
+                    handler(data)
+                }
             }
         }
     }
@@ -144,14 +148,20 @@ final class SocketService {
     //     let payload = data.decode(RoomCreatedPayload.self)
     //   }
 
-    func on(_ event: SocketOnEvent, handler: @escaping ([Any]) -> Void) {
-        handlers[event.rawValue] = handler
-        print("\(logPrefix) handler registered for on-event: \(event.rawValue)")
+    @discardableResult
+    func on(_ event: SocketOnEvent, handler: @escaping ([Any]) -> Void) -> UUID {
+        let id = UUID()
+        if handlers[event.rawValue] == nil {
+            handlers[event.rawValue] = [:]
+        }
+        handlers[event.rawValue]?[id] = handler
+        print("\(logPrefix) handler registered for on-event: \(event.rawValue) with id: \(id)")
+        return id
     }
 
-    func off(_ event: SocketOnEvent) {
-        handlers.removeValue(forKey: event.rawValue)
-        print("\(logPrefix) handler removed for on-event: \(event.rawValue)")
+    func off(_ event: SocketOnEvent, id: UUID) {
+        handlers[event.rawValue]?.removeValue(forKey: id)
+        print("\(logPrefix) handler removed for on-event: \(event.rawValue) with id: \(id)")
     }
 
     // MARK: - Helper para decodificar JSON del servidor

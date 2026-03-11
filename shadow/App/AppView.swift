@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AppView: View {
     @Environment(AppRouter.self) private var router
-    private let socket = SocketService.shared
+    @Environment(SocketService.self) private var socket
 
     var body: some View {
         @Bindable var router = router
@@ -17,7 +17,7 @@ struct AppView: View {
         Group {
             if !socket.isConnected {
                 NoConnectionView(onRetry: {
-                    SocketService.shared.connect()
+                    socket.connect()
                 })
                 .transition(.opacity)
             } else {
@@ -56,4 +56,5 @@ struct AppView: View {
 #Preview {
     AppView()
         .environment(AppRouter())
+        .environment(DIContainer.shared.socketService)
 }
