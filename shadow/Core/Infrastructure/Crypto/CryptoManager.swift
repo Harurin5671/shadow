@@ -22,6 +22,11 @@ final class CryptoManager {
     private var currentRoomCode: String?
     private var myAlias: String?
     private var isCreator: Bool = false
+    
+    // MARK: - Public Getters
+    var currentAlias: String? {
+        return myAlias
+    }
 
     // IDs de listeners para cleanup
     private var participantJoinedId: UUID?

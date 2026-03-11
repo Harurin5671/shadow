@@ -32,15 +32,18 @@ final class RoomJoinViewModel {
     // Listeners
     private var joinListenerId: UUID?
     private var errorListenerId: UUID?
+    private var timeoutTask: Task<Void, Never>?
+    private var listenersSetup = false
 
     init(
         socketService: SocketServiceProtocol = DIContainer.shared.socketService
     ) {
         self.socketService = socketService
-        setupListeners()
+        // No llamar a setupListeners() aquí para evitar múltiples registros
     }
 
     deinit {
+        timeoutTask?.cancel()
         if let id = joinListenerId { socketService.off(.roomJoined, id: id) }
         if let id = errorListenerId { socketService.off(.error, id: id) }
     }
@@ -48,6 +51,9 @@ final class RoomJoinViewModel {
     // MARK: - Unirse a la sala
 
     private func setupListeners() {
+        guard !listenersSetup else { return }
+        listenersSetup = true
+        
         joinListenerId = socketService.on(.roomJoined) { [weak self] data in
             guard let self else { return }
             guard
@@ -60,6 +66,10 @@ final class RoomJoinViewModel {
                 self.errorMessage = "Could not join room. Try again."
                 return
             }
+
+            // Cancelar timeout si la unión es exitosa
+            self.timeoutTask?.cancel()
+            self.timeoutTask = nil
 
             if let creatorPublicKeyB64 = payload.creator?.publicKey,
                 let creatorPublicKeyData = Data(
@@ -92,6 +102,11 @@ final class RoomJoinViewModel {
                     from: data
                 )
             else { return }
+            
+            // Cancelar timeout si recibimos error
+            self.timeoutTask?.cancel()
+            self.timeoutTask = nil
+            
             self.isLoading = false
             self.errorMessage = payload.message
         }
@@ -99,8 +114,28 @@ final class RoomJoinViewModel {
 
     func joinRoom() {
         guard canJoin, !isLoading else { return }
+        
+        // Setup listeners solo cuando se va a unir a la sala
+        if !listenersSetup {
+            setupListeners()
+        }
+        
         isLoading = true
         errorMessage = nil
+
+        // Cancelar timeout anterior si existe
+        timeoutTask?.cancel()
+        
+        // Configurar timeout de 10 segundos
+        timeoutTask = Task {
+            try? await Task.sleep(nanoseconds: 10_000_000_000) // 10 segundos
+            if !Task.isCancelled {
+                await MainActor.run {
+                    self.isLoading = false
+                    self.errorMessage = "Room not found or server timeout. Please check the code and try again."
+                }
+            }
+        }
 
         let finalAlias =
             alias.trimmingCharacters(in: .whitespaces).isEmpty

@@ -75,7 +75,8 @@ struct ChatView: View {
                         
                         Button(action: {
                             if !viewModel.messageInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                                viewModel.sendMessage(message: viewModel.messageInput, senderAlias: "User")
+                                let userAlias = DIContainer.shared.cryptoManager.currentAlias ?? "User"
+                                viewModel.sendMessage(message: viewModel.messageInput, senderAlias: userAlias)
                                 viewModel.messageInput = ""
                             }
                         }) {

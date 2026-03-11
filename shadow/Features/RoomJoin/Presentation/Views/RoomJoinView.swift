@@ -10,7 +10,11 @@ import SwiftUI
 struct RoomJoinView: View {
 
     @Environment(AppRouter.self) private var router
-    @State private var vm = RoomJoinViewModel()
+    @State private var vm: RoomJoinViewModel
+    
+    init() {
+        self._vm = State(initialValue: RoomJoinViewModel())
+    }
 
     var body: some View {
         ZStack {
@@ -20,7 +24,7 @@ struct RoomJoinView: View {
 
                 // ── Header ───────────────────────────────────
                 HStack {
-                    Button { router.goBack() } label: {
+                    Button { router.returnToHome() } label: {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 20, weight: .medium))
                             .foregroundStyle(Color.textPrimary)
