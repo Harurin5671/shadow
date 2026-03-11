@@ -5,18 +5,21 @@
 
 import Foundation
 import SwiftUI
+internal import Combine
 
 @Observable
 final class ChatViewModel {
     
-    // MARK: - State
+    // MARK: - Published Properties
     var messages: [RoomMessagePayload] = []
     var isLoading: Bool = false
     var errorMessage: String? = nil
+    var messageInput: String = ""
     
     // MARK: - Dependencies
     private let roomCode: String
     private let socketService: SocketServiceProtocol
+    private let cryptoManager: CryptoManager
     
     // Listeners
     private var messagesListenerId: UUID?
@@ -25,9 +28,10 @@ final class ChatViewModel {
     
     private var setupDone = false
     
-    init(roomCode: String, socketService: SocketServiceProtocol = DIContainer.shared.socketService) {
+    init(roomCode: String, socketService: SocketServiceProtocol = DIContainer.shared.socketService, cryptoManager: CryptoManager? = nil) {
         self.roomCode = roomCode
         self.socketService = socketService
+        self.cryptoManager = cryptoManager ?? DIContainer.shared.cryptoManager
         // Defer listeners setup to onAppear to avoid side effects during SwiftUI struct initialization
     }
     
@@ -91,7 +95,12 @@ final class ChatViewModel {
         socketService.emit(.roomGetMessages, ["roomCode": roomCode])
     }
     
-    func sendMessage(encryptedPayload: String, senderAlias: String, burnAfter: Int? = 3600) {
+    func sendMessage(message: String, senderAlias: String, burnAfter: Int? = 3600) {
+        guard let encryptedPayload = cryptoManager.encryptMessage(message, for: roomCode) else {
+            errorMessage = "Failed to encrypt message"
+            return
+        }
+        
         let payload: [String: Any] = [
             "roomCode": roomCode,
             "encryptedPayload": encryptedPayload,
@@ -99,5 +108,9 @@ final class ChatViewModel {
             "burnAfter": burnAfter ?? 3600
         ]
         socketService.emit(.messageSend, payload)
+    }
+    
+    func decryptMessage(_ encryptedPayload: String) -> String? {
+        return cryptoManager.decryptMessage(encryptedPayload, for: roomCode)
     }
 }

@@ -17,11 +17,24 @@ final class DIContainer {
     let roomRepository: RoomRepository
     let localNotificationService: LocalNotificationServiceProtocol
     let notificationManager: NotificationManager
+    let storageService: StorageServiceProtocol
+    let cryptoService: CryptoServiceProtocol
+    let cryptoManager: CryptoManager
     
     private init() {
         self.socketService = SocketService.shared
         self.roomRepository = RoomRepository(socketService: self.socketService)
         self.localNotificationService = LocalNotificationService()
+        self.storageService = StorageService.shared
+        self.cryptoService = CryptoService.shared
+        
+        // Crear cryptoManager DESPUÉS de inicializar todo lo demás
+        self.cryptoManager = CryptoManager(
+            crypto: self.cryptoService,
+            storage: self.storageService,
+            socket: self.socketService
+        )
+        
         self.notificationManager = NotificationManager(
             socketService: self.socketService,
             notificationService: self.localNotificationService

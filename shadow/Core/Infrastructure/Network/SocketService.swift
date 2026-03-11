@@ -107,7 +107,7 @@ final class SocketService: SocketServiceProtocol {
             .myRooms, .roomMessages,
             .participantJoined, .participantLeft,
             .messageReceive, .messageSent,
-            .keyReceive,
+            .keyReceive, .roomKeyReceive,
             .securityAlert, .deadManConfirmed, .deadManWarning,
             .typingStart, .typingStop,
             .error,

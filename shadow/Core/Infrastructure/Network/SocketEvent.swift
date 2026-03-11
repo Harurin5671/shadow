@@ -29,6 +29,7 @@ enum SocketEmitEvent: String {
 
     // Cifrado
     case keyExchange  = "key:exchange"
+    case roomKeyShare = "room:key:share"
 
     // Seguridad
     case securityAlert   = "security:alert"
@@ -61,6 +62,7 @@ enum SocketOnEvent: String {
 
     // Cifrado
     case keyReceive       = "key:receive"
+    case roomKeyReceive   = "room:key:receive"
 
     // Seguridad
     case securityAlert    = "security:alert"
@@ -91,6 +93,13 @@ struct RoomJoinedPayload: Decodable {
     let code: String
     let socketId: String
     let participantCount: Int
+    let creator: CreatorPayload?
+}
+
+struct CreatorPayload: Decodable {
+    let socketId: String
+    let alias: String
+    let publicKey: String?
 }
 
 struct MyRoomsPayload: Decodable {
@@ -127,6 +136,8 @@ struct RoomDestroyedPayload: Decodable {
 struct ParticipantJoinedPayload: Decodable {
     let roomCode: String
     let alias: String
+    let socketId: String
+    let publicKey: String?
     let participantCount: Int
 }
 
@@ -166,8 +177,16 @@ struct MessageSentPayload: Decodable {
 
 struct KeyReceivePayload: Decodable {
     let fromSocketId: String
-    let wrappedKey: String   // base64 — clave cifrada con ECDH
+    let fromAlias: String
     let publicKey: String    // base64 — clave publica del emisor
+    let timestamp: Int?
+}
+
+struct RoomKeyReceivePayload: Decodable {
+    let roomCode: String
+    let wrappedRoomKey: String  // base64 — room key cifrada con ECDH
+    let senderAlias: String
+    let timestamp: Int?
 }
 
 struct SecurityAlertPayload: Decodable {

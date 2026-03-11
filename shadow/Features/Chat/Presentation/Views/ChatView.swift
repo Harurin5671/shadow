@@ -53,7 +53,7 @@ struct ChatView: View {
                                         .foregroundStyle(.gray)
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                     
-                                    Text(message.encryptedPayload)
+                                    Text(viewModel.decryptMessage(message.encryptedPayload) ?? message.encryptedPayload)
                                         .padding()
                                         .background(Color.white.opacity(0.1))
                                         .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -65,6 +65,28 @@ struct ChatView: View {
                         .padding(.vertical)
                     }
                 }
+                
+                // Message input
+                VStack(spacing: 12) {
+                    HStack(spacing: 12) {
+                        TextField("Type a message...", text: $viewModel.messageInput)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .foregroundStyle(Color.textPrimary)
+                        
+                        Button(action: {
+                            if !viewModel.messageInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                viewModel.sendMessage(message: viewModel.messageInput, senderAlias: "User")
+                                viewModel.messageInput = ""
+                            }
+                        }) {
+                            Image(systemName: "paperplane.fill")
+                                .foregroundStyle(Color.accentYellow)
+                        }
+                        .disabled(viewModel.messageInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
+                    .padding(.horizontal)
+                }
+                .padding(.bottom)
             }
         }
         .onAppear {

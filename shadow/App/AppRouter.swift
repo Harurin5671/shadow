@@ -12,6 +12,8 @@ final class AppRouter {
     var currentScreen: Screen = .onboarding
     var navigationPath: [Destination] = []
     var isShowingRoomCreation: Bool = false
+    
+    private let storageService: StorageServiceProtocol
 
     enum Screen {
         case onboarding
@@ -57,21 +59,20 @@ final class AppRouter {
     }
 
     func completeOnboarding() {
-        UserDefaults.standard.set(true, forKey: "shadow.hasSeenOnboarding")
+        storageService.setOnboardingCompleted(true)
         withAnimation(.easeInOut(duration: 0.35)) {
             currentScreen = .main
         }
     }
 
     func resetOnboarding() {
-        UserDefaults.standard.removeObject(forKey: "shadow.hasSeenOnboarding")
+        storageService.resetOnboarding()
         withAnimation { currentScreen = .onboarding }
     }
     
-    init() {
-        let seen = UserDefaults.standard.bool(
-            forKey: "shadow.hasSeenOnboarding"
-        )
+    init(storageService: StorageServiceProtocol = DIContainer.shared.storageService) {
+        self.storageService = storageService
+        let seen = self.storageService.hasSeenOnboarding()
         currentScreen = seen ? .main : .onboarding
     }
 }

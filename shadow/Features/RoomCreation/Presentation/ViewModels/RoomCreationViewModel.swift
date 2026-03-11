@@ -71,10 +71,12 @@ final class RoomCreationViewModel {
 
     // MARK: - Dependencies
     private let socket: SocketServiceProtocol
+    private let cryptoManager: CryptoManager
     private var roomCreatedHandlerId: UUID?
 
-    init(socket: SocketServiceProtocol = DIContainer.shared.socketService) {
+    init(socket: SocketServiceProtocol = DIContainer.shared.socketService, cryptoManager: CryptoManager? = nil) {
         self.socket = socket
+        self.cryptoManager = cryptoManager ?? DIContainer.shared.cryptoManager
     }
 
     var onDismiss: (() -> Void)?
@@ -144,6 +146,13 @@ final class RoomCreationViewModel {
             )
             
             print("[RoomCreationViewModel] Room created successfully! Code: \(payload.code)")
+            
+            // Setup crypto como creator
+            cryptoManager.setupAsCreator(for: payload.code, alias: self.alias)
+
+            // Emitir clave pública del creator al room para iniciar key exchange
+            cryptoManager.emitMyPublicKey(for: payload.code, alias: self.displayAlias)
+            
             self.onRoomCreated?()
             self.onRoomCreatedWithData?(newRoom)
             
