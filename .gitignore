@@ -1,0 +1,14 @@
+# Xcode — archivos de usuario, no van al repo
+xcuserdata/
+*.xcuserstate
+DerivedData/
+
+# macOS
+.DS_Store
+
+# SPM — el Package.resolved sí va al repo (versiones fijas)
+.swiftpm/configuration/
+
+# Config con secrets
+shadow/Config/Debug.xcconfig
+shadow/Config/Release.xcconfig

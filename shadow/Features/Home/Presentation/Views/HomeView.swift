@@ -214,38 +214,6 @@ struct HomeView: View {
                         uppercase: true
                     )
                 }
-                
-                // MARK: - Testing Local Notifications (Temporal)
-                HStack(spacing: 12) {
-                    Button("Test Now") {
-                        DIContainer.shared.localNotificationService.scheduleNotification(
-                            title: "Local Notification (Now)",
-                            body: "This is an immediate foreground test.",
-                            identifier: UUID().uuidString,
-                            delay: 0.1
-                        )
-                    }
-                    .font(.caption).bold()
-                    .padding(.horizontal, 12).padding(.vertical, 6)
-                    .background(Color.white.opacity(0.1))
-                    .clipShape(Capsule())
-                    .foregroundStyle(.white)
-
-                    Button("Test in 60s (BG)") {
-                        DIContainer.shared.localNotificationService.scheduleNotification(
-                            title: "Background Note",
-                            body: "This notification was delayed by 60s.",
-                            identifier: UUID().uuidString,
-                            delay: 60.0
-                        )
-                    }
-                    .font(.caption).bold()
-                    .padding(.horizontal, 12).padding(.vertical, 6)
-                    .background(Color.accentYellow.opacity(0.2))
-                    .clipShape(Capsule())
-                    .foregroundStyle(Color.accentYellow)
-                }
-                .padding(.top, 4)
             }
             .padding(.horizontal, 24)
         }

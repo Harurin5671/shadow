@@ -20,7 +20,7 @@ struct shadowApp: App {
                 .environment(diContainer.roomRepository)
                 .preferredColorScheme(ColorScheme.dark)
                 .task {
-                    diContainer.socketService.connect(url: "http://localhost:3000")
+                    diContainer.socketService.connect(url: AppConfig.apiBaseURL)
                 }
         }
     }

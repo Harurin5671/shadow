@@ -37,7 +37,7 @@ final class SocketService: SocketServiceProtocol {
 
     // MARK: - Conexion
 
-    func connect(url: String = "http://localhost:3000") {
+    func connect(url: String = AppConfig.apiBaseURL) {
         print(
             "\(logPrefix) connect() called with url=\(url). isConnected=\(isConnected)"
         )
