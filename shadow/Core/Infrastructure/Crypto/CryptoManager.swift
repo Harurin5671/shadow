@@ -80,7 +80,7 @@ final class CryptoManager {
         // Solo relevante si en el futuro queremos P2P completo.
         // Por ahora el flujo usa room:key:receive directamente.
         keyReceiveId = socket.on(.keyReceive) { [weak self] data in
-            guard let self else { return }
+            guard self != nil else { return }
             print("[CryptoManager] key:receive recibido — ignorado (flujo usa room:key:receive)")
         }
 
